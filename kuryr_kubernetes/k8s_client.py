@@ -40,7 +40,7 @@ class K8sClient(object):
         token_file = config.CONF.kubernetes.token_file
         if token_file:
             with open(token_file, 'r') as f:
-            	self.token = f.readline()
+            	self.token = f.readline().rstrip('\n')
         else:
             if cert_file and not os.path.exists(cert_file):
                 raise RuntimeError(
@@ -65,7 +65,7 @@ class K8sClient(object):
         url = self._base_url + path
         response = requests.get(url, cert=self.cert,
                                 verify=self.verify_server,
-                                headers={'Authorization': 'Bearer %s' % token})
+                                headers={'Authorization': 'Bearer %s' % self.token})
         if not response.ok:
             raise exc.K8sClientException(response.text)
         return response.json()
@@ -91,8 +91,8 @@ class K8sClient(object):
             response = requests.patch(url, data=data, headers={
                 'Content-Type': 'application/merge-patch+json',
                 'Accept': 'application/json',
-            }, cert=self.cert, verify=self.verify_server,
-            headers={'Authorization': 'Bearer %s' % self.token})
+                'Authorization': 'Bearer %s' % self.token
+            }, cert=self.cert, verify=self.verify_server)
             if response.ok:
                 return response.json()['metadata']['annotations']
             if response.status_code == requests.codes.conflict:
@@ -122,7 +122,7 @@ class K8sClient(object):
             with contextlib.closing(
                     requests.get(url, params=params, stream=True,
                     cert=self.cert, verify=self.verify_server,
-                    headers={'Authorization': 'Bearer %s' % token})) as response:
+                    headers={'Authorization': 'Bearer %s' % self.token})) as response:
                 if not response.ok:
                     raise exc.K8sClientException(response.text)
                 for line in response.iter_lines(delimiter='\n'):
