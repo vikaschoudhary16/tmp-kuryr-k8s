@@ -40,7 +40,7 @@ class K8sClient(object):
         token_file = config.CONF.kubernetes.token_file
         if token_file:
             with open(token_file, 'r') as f:
-            self.token = f.readline()
+            	self.token = f.readline()
         else:
             if cert_file and not os.path.exists(cert_file):
                 raise RuntimeError(
@@ -92,7 +92,7 @@ class K8sClient(object):
                 'Content-Type': 'application/merge-patch+json',
                 'Accept': 'application/json',
             }, cert=self.cert, verify=self.verify_server,
-            headers={'Authorization': 'Bearer %s' % token})
+            headers={'Authorization': 'Bearer %s' % self.token})
             if response.ok:
                 return response.json()['metadata']['annotations']
             if response.status_code == requests.codes.conflict:

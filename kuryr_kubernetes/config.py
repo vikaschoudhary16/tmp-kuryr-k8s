@@ -43,7 +43,7 @@ k8s_opts = [
     cfg.BoolOpt('ssl_verify_server_crt',
         help=_("HTTPS K8S_API server identity verification"),
         default=False),
-    cfg.StrOpt('token',
+    cfg.StrOpt('token_file',
         help=_("The token to talk to the k8s API"),
         default=''),
     cfg.StrOpt('pod_project_driver',
