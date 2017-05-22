@@ -61,6 +61,9 @@ class K8sCNIPlugin(cni_api.CNIPlugin):
         config.init(args)
         config.setup_logging()
         os_vif.initialize()
+        ovs = os_vif._EXT_MANAGER['ovs'].obj
+        ovs_mod = sys.modules[ovs.__module__]
+        ovs_mod.linux_net.privsep.vif_plug.start(ovs_mod.linux_net.privsep.priv_context.Method.FORK)
         clients.setup_kubernetes_client()
         self._pipeline = h_cni.CNIPipeline()
         self._watcher = k_watcher.Watcher(self._pipeline)
